@@ -1,68 +1,69 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import axios from "axios";
 
-
 export default function App() {
-  const fetchPosts = () => {
-    axios.get("http://localhost:3000/posts").then(function (response) {
-      console.log('i dati presi dalla chiamata', response.data)
-    });
-  };
-
-  useEffect(fetchPosts, []);
-  
-  const fixedItems = ["Pane", "Acqua", "Uova"];
+  const [shoppingList, setShoppingList] = useState([]);
   const [author, setAuthor] = useState("");
   const [content, setContent] = useState("");
-  const [category, setCategory] = useState("FrontEnd");
-  const [shoppingList, setShoppingList] = useState([]);
+  const [image, setImage] = useState("");
+  const [category, setCategory] = useState("Antipasto");
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:3000/posts")
+      .then((response) => {
+        console.log("Dati ricevuti:", response.data);
+        setShoppingList(response.data);
+      });
+  }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const newEntry = { author, content, category };
-    setShoppingList([...shoppingList, newEntry]);
-
-    setAuthor("");
-    setContent("");
-    setCategory("FrontEnd");
   };
 
   return (
     <div>
-      <h1>Lista</h1>
-      <ul>
-        {fixedItems.map((item, index) => (
-          <li key={index}>{item}</li>
+      <h1>Lista dei Post</h1>
+      <div>
+        {shoppingList.map((item) => (
+          <div key={item.id}>
+            <img src={item.image} alt="Immagine" />
+            <h2>{item.name}</h2>
+            <p>{item.ingredienti.join(", ")}</p>
+          </div>
         ))}
-        {shoppingList.map((item, index) => (
-          <li key={index + fixedItems.length}>
-            <strong>{item.author}:</strong> {item.content} ({item.category})
-          </li>
-        ))}
-      </ul>
+      </div>
 
       <hr />
-      <h3>Aggiungi alla lista</h3>
+      <h3>Aggiungi un nuovo post</h3>
       <form onSubmit={handleSubmit}>
-        <label>Autore</label>
-        <input 
-          type="text" 
-          value={author} 
-          onChange={(e) => setAuthor(e.target.value)} 
+        <label>Nome</label>
+        <input
+          type="text"
+          value={author}
+          onChange={(e) => setAuthor(e.target.value)}
         />
 
-        <label>Contenuto</label>
-        <input 
-          type="text" 
-          value={content} 
-          onChange={(e) => setContent(e.target.value)} 
+        <label>Ingredienti</label>
+        <input
+          type="text"
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+        />
+
+        <label>Immagine (URL)</label>
+        <input
+          type="text"
+          value={image}
+          onChange={(e) => setImage(e.target.value)}
         />
 
         <label>Categoria</label>
         <select value={category} onChange={(e) => setCategory(e.target.value)}>
-          <option value="FrontEnd">FrontEnd</option>
-          <option value="BackEnd">BackEnd</option>
-          <option value="UI/UX">UI/UX</option>
+        <option value="Antipasto">Antipasto</option>
+          <option value="Primo piatto">Primo piatto</option>
+          <option value="Secondo piatto">Secondo piatto</option>
+          <option value="Dolce">Dolce</option>
         </select>
 
         <button type="submit">Invia</button>
